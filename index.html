@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MELLSTROY Analytics</title>
+
+<style>
+
+:root{
+--bg:#000000;
+--card:#0d0d0d;
+--border:#1f1f1f;
+--gold:#f0bf3d;
+--text:#ffffff;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:var(--bg);
+color:var(--text);
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+}
+
+.header{
+margin-bottom:25px;
+}
+
+.logo{
+font-size:32px;
+font-weight:700;
+color:var(--gold);
+text-align:center;
+}
+
+.subtitle{
+text-align:center;
+opacity:.7;
+margin-top:5px;
+}
+
+.card{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:24px;
+padding:20px;
+margin-bottom:20px;
+}
+
+.label{
+margin-bottom:8px;
+font-size:14px;
+opacity:.8;
+}
+
+select{
+width:100%;
+padding:18px;
+background:#141414;
+color:#fff;
+border:1px solid #242424;
+border-radius:20px;
+margin-bottom:18px;
+font-size:18px;
+outline:none;
+appearance:none;
+-webkit-appearance:none;
+transition:.2s;
+box-shadow:
+inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+select:focus{
+border-color:#f0bf3d;
+box-shadow:0 0 0 3px rgba(240,191,61,.15);
+}
+
+button{
+width:100%;
+padding:16px;
+background:var(--gold);
+color:black;
+border:none;
+border-radius:16px;
+font-size:18px;
+font-weight:700;
+cursor:pointer;
+}
+
+.result{
+min-height:120px;
+}
+
+.status{
+color:#44d16a;
+font-weight:bold;
+}
+.custom-select{
+background:#141414;
+border:1px solid #242424;
+border-radius:20px;
+padding:18px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;
+margin-bottom:12px;
+font-size:18px;
+transition:.25s;
+}
+
+.custom-select:hover{
+border-color:#f0bf3d;
+}
+
+.custom-select.active{
+border-color:#f0bf3d;
+box-shadow:0 0 0 3px rgba(240,191,61,.15);
+}
+
+.custom-menu{
+background:#111;
+border:1px solid #242424;
+border-radius:20px;
+overflow:hidden;
+margin-bottom:15px;
+display:none;
+opacity:0;
+transform:translateY(-10px);
+transition:.25s;
+box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+
+.custom-item{
+padding:18px;
+font-size:18px;
+border-bottom:1px solid #1f1f1f;
+}
+
+.custom-item:last-child{
+border-bottom:none;
+}
+.total-card{
+background:#0d0d0d;
+border:1px solid #1f1f1f;
+border-radius:24px;
+padding:22px;
+margin:20px 0 25px;
+box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+.total-title{
+font-size:16px;
+color:#999;
+margin-bottom:8px;
+}
+
+.total-amount{
+font-size:46px;
+font-weight:800;
+color:#f0bf3d;
+line-height:1;
+}
+.queue-card{
+background:#111111;
+border:1px solid #242424;
+border-radius:24px;
+padding:24px;
+margin-top:14px;
+box-shadow:0 8px 20px rgba(0,0,0,.35);
+transition:.25s;
+}
+
+.queue-card:hover{
+transform:translateY(-2px);
+border-color:#2f2f2f;
+}
+.queue-title{
+font-size:20px;
+font-weight:700;
+color:#f0bf3d;
+margin-bottom:10px;
+}
+
+.queue-amount{
+font-size:28px;
+font-weight:700;
+margin-bottom:10px;
+}
+
+.queue-status{
+display:inline-block;
+padding:8px 14px;
+border-radius:999px;
+font-weight:700;
+font-size:14px;
+}
+
+.status-paid{
+background:rgba(73,209,109,.15);
+color:#49d16d;
+border:1px solid rgba(73,209,109,.3);
+}
+
+.status-unpaid{
+background:rgba(255,107,107,.15);
+color:#ff6b6b;
+border:1px solid rgba(255,107,107,.3);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<div class="logo">MELLSTROY Analytics</div>
+<div class="subtitle">Анализ очередей и выплат</div>
+</div>
+
+<div class="card">
+
+<div class="label">Кошелёк</div>
+
+<div class="custom-select" id="walletSelect">
+<span>Саша</span>
+<span>▼</span>
+</div>
+
+<div id="walletMenu" class="custom-menu" style="display:none;">
+<div class="custom-item" data-wallet="sasha">Саша</div>
+<div class="custom-item" data-wallet="vika">Вика</div>
+<div class="custom-item" data-wallet="custom">Другой адрес</div>
+</div>
+
+<input type="hidden" id="wallet" value="sasha">
+<input
+id="customWallet"
+type="text"
+placeholder="Введите адрес USDT TRC20"
+style="
+display:none;
+width:100%;
+padding:18px;
+background:#141414;
+color:#fff;
+border:1px solid #242424;
+border-radius:20px;
+margin-bottom:18px;
+font-size:18px;
+outline:none;
+">
+
+<div class="label">Лист</div>
+
+<div class="custom-select" id="sheetSelect">
+<span>Автозагрузка листов</span>
+<span>▼</span>
+</div>
+
+<div class="custom-menu" id="sheetMenu">
+
+
+
+<div class="custom-item" data-sheet="2025(7)">
+2025(7)
+</div>
+
+<div class="custom-item" data-sheet="2026(1)">
+2026(1)
+</div>
+
+</div>
+
+</div>
+
+
+<input type="hidden" id="sheet" value="2025(7)">
+
+<div class="label">Режим анализа</div>
+
+<div class="custom-select" id="modeSelect">
+<span>Мои очереди</span>
+<span>▼</span>
+</div>
+
+<div class="custom-menu" id="modeMenu">
+
+<div class="custom-item" data-value="queues">
+Мои очереди
+</div>
+
+<div class="custom-item" data-value="unpaid">
+Не оплачено (общий долг)
+</div>
+
+<div class="custom-item" data-value="sheet">
+Весь долг по листу
+</div>
+
+<div class="custom-item" data-value="total">
+Общий текущий долг
+</div>
+
+</div>
+
+<input type="hidden" id="mode" value="queues">
+
+<button onclick="analyze()">
+Анализировать
+</button>
+
+</div>
+
+<div class="card result" id="result">
+
+<div class="status">
+🟢 Приложение запущено
+</div>
+
+<br>
+
+Ожидание анализа...
+
+</div>
+
+</div>
+
+<script>
+
+const TABLE_ID =
+"1YxfQveUZxhKvGywrvUscaFEhwaX5jH-ukXKT0H4zkpo";
+const APP_VERSION = "1.0.0";
+const AVAILABLE_SHEETS = [
+"2025(7)",
+"2026(1)"
+];
+async function loadSheets(){
+
+try{
+
+const response = await fetch(
+`https://docs.google.com/spreadsheets/d/${TABLE_ID}/gviz/tq?tqx=out:json`
+);
+
+const text = await response.text();
+
+
+// const data = await response.json();
+// alert(JSON.stringify(data));
+AVAILABLE_SHEETS.length = 0;
+
+data.feed.entry.forEach(sheet=>{
+
+AVAILABLE_SHEETS.push(
+sheet.title.$t
+);
+
+});
+
+console.log(
+"Листы:",
+AVAILABLE_SHEETS
+);
+
+}catch(err){
+alert(err);
+console.error(err);
+
+}
+
+
+}
+const sheetMenu =
+document.getElementById("sheetMenu");
+
+async function buildSheetMenu(){
+
+await loadSheets();
+
+AVAILABLE_SHEETS.forEach(sheet=>{
+
+sheetMenu.innerHTML += `
+<div class="custom-item" data-sheet="${sheet}">
+${sheet}
+</div>
+`;
+
+});
+
+}
+
+// buildSheetMenu();
+async function analyze(){
+
+const result =
+document.getElementById("result");
+
+const selectedWallet =
+document.getElementById("wallet").value;
+
+const wallets = {
+sasha:"TBnzBYzgDMUKg2m3ZMJaQTas1ziJ8t6Qyd",
+vika:"TWqUrwVRJQosdhLFQmhog3b5438qDrA1no"
+};
+
+let wallet;
+
+if(selectedWallet==="custom"){
+
+wallet =
+document.getElementById("customWallet")
+.value
+.trim();
+
+}else{
+
+wallet =
+wallets[selectedWallet];
+
+}
+
+result.innerHTML = `
+<div class="status">
+🟢 Ищем очереди...
+</div>
+`;
+
+try{
+
+const url =
+`https://docs.google.com/spreadsheets/d/${TABLE_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(document.getElementById("sheet").value==="auto" ? "2025(7)" : document.getElementById("sheet").value)}`;
+
+const response =
+await fetch(url);
+
+const text =
+await response.text();
+
+const start =
+text.indexOf("{");
+
+const end =
+text.lastIndexOf("}");
+
+const json =
+JSON.parse(
+text.substring(start,end+1)
+);
+
+const rows =
+json.table.rows || [];
+
+const mode =
+document.getElementById("mode").value;
+
+if(mode==="sheet"){
+
+let total = 0;
+
+for(const row of rows){
+
+const cells = row.c || [];
+
+total += Number(cells[3]?.v || 0);
+
+}
+
+result.innerHTML = `
+<div class="total-card">
+<div class="total-title">
+💰 Весь долг по листу
+</div>
+<div class="total-amount">
+$${total.toLocaleString()}
+</div>
+</div>
+`;
+
+return;
+}
+
+let found = [];
+let totalAmount = 0;
+for(let i=0;i<rows.length;i++){
+
+const cells =
+rows[i].c || [];
+
+const реквизит =
+String(cells[1]?.v || "");
+
+if(реквизит.includes(wallet)){
+
+found.push({
+queue:i+1,
+amount:cells[3]?.v || 0,
+status:cells[5]?.v || "-"
+});
+
+totalAmount += Number(cells[3]?.v || 0);
+}
+
+}
+
+if(found.length===0){
+
+result.innerHTML = `
+<div style="color:#ff6666">
+❌ Очереди не найдены
+</div>
+`;
+
+return;
+}
+
+let html = `
+<div class="status">
+🟢 Найдено очередей: ${found.length}
+</div>
+
+<div class="total-card">
+<div class="total-title">
+💰 Общая сумма
+</div>
+
+<div class="total-amount">
+$${totalAmount.toLocaleString()}
+</div>
+</div>
+
+<br>
+`;
+
+for(const row of found){
+
+html += `
+<div class="queue-card">
+
+<div class="queue-title">
+№ ${row.queue}
+</div>
+
+<div class="queue-amount">
+$${row.amount}
+</div>
+
+<div class="queue-status ${
+row.status.toUpperCase().includes("ОПЛАЧЕНО")
+&& !row.status.toUpperCase().includes("НЕ")
+? "status-paid"
+: "status-unpaid"
+}">
+${row.status}
+</div>
+
+</div>
+`;
+
+}
+
+result.innerHTML = html;
+
+}catch(err){
+
+result.innerHTML = `
+<div style="color:red">
+❌ Ошибка
+<br><br>
+${err.message}
+</div>
+`;
+
+console.error(err);
+
+}
+
+}
+document.querySelectorAll(".custom-select").forEach(select=>{
+
+select.addEventListener("click",()=>{
+
+const menu =
+select.nextElementSibling;
+
+if(menu.style.display==="block"){
+menu.style.opacity="0";
+menu.style.transform="translateY(-10px)";
+
+setTimeout(()=>{
+menu.style.display="none";
+},200);
+
+}else{
+
+menu.style.display="block";
+
+setTimeout(()=>{
+menu.style.opacity="1";
+menu.style.transform="translateY(0)";
+},10);
+
+}
+
+select.classList.toggle("active");
+
+});
+
+});
+
+document.querySelectorAll(".custom-item").forEach(item=>{
+
+item.addEventListener("click",()=>{
+
+const menu =
+item.parentElement;
+
+const select =
+menu.previousElementSibling;
+
+select.querySelector("span").textContent =
+item.textContent;
+if(select.id==="walletSelect"){
+
+const walletValue =
+item.dataset.wallet;
+
+document.getElementById("wallet").value =
+walletValue;
+
+const customWallet =
+document.getElementById("customWallet");
+
+customWallet.style.display =
+walletValue==="custom"
+? "block"
+: "none";
+
+}
+if(select.id==="sheetSelect"){
+
+document.getElementById("sheet").value =
+item.dataset.sheet;
+
+}
+if(select.id==="modeSelect"){
+
+const values={
+"Мои очереди":"queues",
+"Не оплачено (общий долг)":"unpaid",
+"Весь долг по листу":"sheet",
+"Общий текущий долг":"total"
+};
+
+document.getElementById("mode").value =
+values[item.textContent];
+
+}
+menu.style.display="none";
+
+select.classList.remove("active");
+
+});
+
+});
+setInterval(() => {
+
+analyze();
+
+}, 300000);
+</script>
+
+</body>
+</html>
